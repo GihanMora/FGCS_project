@@ -28,7 +28,7 @@ for each_p in df['post']:
 
 # print(post_set[0])
 # print(run_lda_model(self_harm_post_set, 10))
-# print(run_guided_lda_model(self_harm_post_set,7))
+# print(run_guided_lda_model(anxiety_post_set,4))
 # a_tr=run_textrank_model(anxiety_post_set,50,5)
 # b_tr=run_textrank_model(BI_polar_post_set,50,5)
 # s_tr=run_textrank_model(self_halm_post_set,50,5)
@@ -58,21 +58,21 @@ for each_p in df['post']:
 # key_phrase_extract(BI_polar_post_set[:600],50)
 # key_phrase_extract(self_harm_post_set,50)
 
-a_nt_c=extract_nearest_tokens(anxiety_post_set,"anxiety","CBOW")
+# a_nt_c=extract_nearest_tokens(anxiety_post_set,"anxiety","CBOW")
 # a_nt_s=extract_nearest_tokens(anxiety_post_set,"anxiety","SKIP")
 # b_n_t_c=extract_nearest_tokens(BI_polar_post_set,"bi polar","CBOW")
 # b_n_t_s=extract_nearest_tokens(BI_polar_post_set,"bi polar","SKIP")
 # s_n_t_c=extract_nearest_tokens(self_harm_post_set,"self harm","CBOW")
 # s_n_t_s=extract_nearest_tokens(self_harm_post_set,"self harm","SKIP")
-cbow_list = []
-print(len(a_nt_c))
-for each in a_nt_c:
-    cbow_list.append(each[0])
+# cbow_list = []
+# print(len(a_nt_c))
+# for each in a_nt_c:
+#     cbow_list.append(each[0])
 # skip_list = []
 # for each in s_n_t_s:
 #     skip_list.append(each[0])
 #
-print(cbow_list)
+# print(cbow_list)
 # print(skip_list)
 #
 # b_n_t_c=extract_nearest_tokens(BI_polar_post_set,"bi polar","CBOW")

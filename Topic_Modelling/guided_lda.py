@@ -40,7 +40,7 @@ def remove_stopwords(texts):#remove stopwords to do more effective extraction
 
 
 
-def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):#lemmatize words to get core word
+def lemmatization(texts, allowed_postags=['NOUN']):#lemmatize words to get core word
     """https://spacy.io/api/annotation"""
     nlp = spacy.load('en', disable=['parser', 'ner'])
     nlp.max_length = 150000000
@@ -64,7 +64,7 @@ def run_guided_lda_model(posts,number_of_topics):#this will extract paragraph an
     print("words_list_no stop", len(data_words_nostops))
     data_words_bigrams = make_bigrams(data_words_nostops, bigram_mod)
 
-    data_lemmatized = lemmatization(data_words_bigrams, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+    data_lemmatized = lemmatization(data_words_bigrams, allowed_postags=['NOUN'])
     print('data_lemmatized...')
     all_tokens = [j for i in data_lemmatized for j in i]
     combined_text = " ".join(all_tokens)
@@ -87,14 +87,81 @@ def run_guided_lda_model(posts,number_of_topics):#this will extract paragraph an
 
 
     seed_topic_list = [
-        ['symptoms','health','disorder','care','palpitation']#health conditions
-, ['medication','doctor','clinical','psychologist','cardiology','therapy']  #medical context
-, ['fear','feeling','scared','worry','scary','pain']  #feelings
-, ['social','family','friend','people','child']  #social context
-, ['good', 'bad','constant ','high','extreme','general','panic','normal']  #conditions
-, ['head','body','hand','brain']  #physical
-, ['advice', 'help', 'support']  # support
+        ['physical symptoms'#Physical symptoms
+            , 'anxiety head'
+            , 'panic attack'
+            , 'muscle twitch'
+            , 'hand'
+            , 'pain'
+            , 'brain'
+            , 'body'
+            , 'coronary angiograms'
+            , 'untamed beasts sometimes'
+            , 'distorting stifling'
+            , 'obsessive compulsive disorder'
+            , 'nerve conduction studies'
+            , 'compressed ulnar nerve'
+            , 'carpal tunnel syndrome'
+            , 'benign fasciculation syndrome'
+            , 'ventricular ectopic beats'
+            , 'chronic pain'
+            , 'palpitation'
+            , 'cardiology'],
+['medication',#Treatments/ mentions of doctor, therapist
+'doctor',
+'psychologist',
+'appointment',
+'clinical',
+ 'gloval structures need',
+'contact cardiology offices',
+'nice paramedics advised',
+'monitor physiological symptoms',
+'medical professional',
+'residential care facility',
+'mental health plan',
+'heart_defect_surgery',
+'period sort trauma',
+'latest depression med',
+'safety planning',
+'mental health counsellor',
+'mental health plan',
+'therapy'],
+
+['positive self talk',#Seeking Support
+'health counsellor support',
+'thank post',
+ 'answer question irrational',
+'thank kind word',
+'bipolar support group',
+'little support work',
+'mental health support',
+'huge hug',
+'great support',
+'private message support',
+'recovery support strategy',
+'advice',
+'help',
+'support'],
+['family time',#Family issues/ relationship issues
+'crave social interactions',
+'big life change',
+'home safe',
+'bed spare room',
+ 'family things',
+'best friends',
+'good friend',
+'side effect',
+'junk food',
+'close friend family',
+'long term relationship',
+'low self esteem',
+'bipolar sibling illness',
+'social',
+'every rejection comes',
+'nobody sat next',
+'cyber bullies']
 ]
+
 # #bi
 #     seed_topic_list = [
 #         [ 'health', 'disorder', 'care']  # health conditions
@@ -115,7 +182,7 @@ def run_guided_lda_model(posts,number_of_topics):#this will extract paragraph an
 #         , ['head', 'body', 'hand', 'brain']  # physical
 #         , ['advice', 'help', 'support']  # support
 #     ]
-    number_of_topics=7
+    number_of_topics=4
 
     model = guidedlda.GuidedLDA(n_topics=number_of_topics, n_iter=100, random_state=7, refresh=20)
 
@@ -134,9 +201,9 @@ def run_guided_lda_model(posts,number_of_topics):#this will extract paragraph an
 
     # print('st',seed_topics)
     # seed_topics = {3543: 0, 656: 0, 3940: 0, 5907: 1, 5690: 1, 1329: 1, 7364: 2, 4496: 2}
-    model.fit(X, seed_topics=seed_topics, seed_confidence=0.35)
+    model.fit(X, seed_topics=seed_topics, seed_confidence=0.55)
 
-    n_top_words = 15
+    n_top_words = 30
     topic_word = model.topic_word_
     # print(topic_word)
     topics_set = []

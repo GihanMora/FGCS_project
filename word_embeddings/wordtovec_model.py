@@ -6,8 +6,11 @@ import json
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 import warnings
+import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
+from sklearn.cluster import KMeans
+
 warnings.filterwarnings(action='ignore')
 import matplotlib.pyplot as plt
 from gensim.utils import simple_preprocess
@@ -26,7 +29,8 @@ from gensim.models import Word2Vec
 from wordcloud import STOPWORDS
 stop_words = list(STOPWORDS)+["one","going","go","things","will","know","really","said","say","see","talk","think","time","help","thing","want","day","work"]
 def get_ngrams(tokens, n ):
-    n_grams = ngrams(tokens, n)
+    n_grams = list(ngrams(tokens, n))
+    print(n_grams)
     return [ ' '.join(grams) for grams in n_grams]
 def sent_to_words(sentences):#split sentences to words and remove punctuations
 
@@ -47,13 +51,19 @@ def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):#lemmat
     return texts_out
 
 
-def extract_nearest_tokens(posts,category,model):
+def extract_nearest_tokens(posts,category,model_a):
     data_words = list(sent_to_words(posts))
     data_words_nostops = remove_stopwords(data_words)
     data_lemmatized = lemmatization(data_words_nostops, allowed_postags=['NOUN', 'ADJ'])
+    tri_g=[]
+    for each in data_lemmatized:
+        tr = get_ngrams(each, 3)
+        tri_g.append(tr)
     #
-    # print('lemma',data_lemmatized)
-    # all_tokens = [j for i in data_lemmatized for j in i]
+    print('tri g',tri_g)
+    all_tokens = [j for i in data_lemmatized for j in i]
+    n_g = get_ngrams(all_tokens, 3)
+    print(n_g)
     # combined_text = " ".join(all_tokens)
     # print("all tokens",all_tokens)
     # print(category.split(" "))
@@ -79,12 +89,38 @@ def extract_nearest_tokens(posts,category,model):
     #     data.append(temp)
     # print('data',data)
     try:
-        if(model=='CBOW'):
-            model1 = gensim.models.Word2Vec(data_lemmatized , min_count=1,size=100, window=5)
+        if(model_a=='CBOW'):
+            model = gensim.models.Word2Vec(tri_g , min_count=1,size=100, window=5)
 
-            cbow_results = model1.most_similar(positive=category.split(" "), topn=100)
+            # cbow_results = model1.most_similar(positive=category.split(" "), topn=100)
+            seed = ['physical','symptom'#Physical symptoms
+            , 'anxiety','head'
+            , 'panic','attack'
+            , 'muscle','twitch'
+            , 'hand'
+            , 'pain'
+            , 'brain'
+            , 'body'
+            , 'coronary'
+            , 'untamed',
+            
+            'disorder'
+            , 'nerve',
+            
+            'syndrome'
+
+            , 'chronic','pain'
+            , 'palpitation'
+            , 'cardiology']
+            #
+            # similarity = model.wv.n_similarity(['muscle'], ['fun'])
+            # print(similarity)
+            cbow_results = model.most_similar(positive=['physical','pain','body'],negative=['fear','doctor','people','day','much'], topn=10)
             print("cbow", cbow_results)
-            return cbow_results
+            #
+
+
+            # return cbow_results
 
 
 
@@ -96,13 +132,19 @@ def extract_nearest_tokens(posts,category,model):
             return skip_results
 
 
-    except KeyError:
-        print("error")
+    except SyntaxError:
+        print("error",KeyError)
         return []
 
 
 
+df = pd.read_csv("../Data/ANXIETY_all_posts.csv", encoding='utf8')
+# print(df['post'][0])
+anxiety_post_set = []
+for each_p in df['post']:
+    anxiety_post_set.append(each_p)
 
+extract_nearest_tokens(anxiety_post_set,"anxiety","CBOW")
 
 
 

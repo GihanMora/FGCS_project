@@ -6,11 +6,17 @@ from gensim.models import CoherenceModel
 from gensim.utils import simple_preprocess
 # spacy for lemmatization
 import spacy
-
+import pandas as pd
 # Enable logging for gensim
 import logging
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
 
+from nltk import ngrams
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
+def get_ngrams(tokens, n ):
+    n_grams = list(ngrams(tokens, n))
+    print(n_grams)
+    return [ ' '.join(grams) for grams in n_grams]
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 # NLTK Stop words
@@ -72,15 +78,22 @@ def run_lda_model(posts,number_of_topics):#this will extract paragraph and heade
     # Do lemmatization keeping only noun, adj, vb, adv
     data_lemmatized = lemmatization(data_words_bigrams, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
     print('data_lemmatized...')
+    tri_g = []
+    for each in data_lemmatized:
+        tr = get_ngrams(each, 3)
+        tri_g.append(tr)
     # print("words_list_lemma", len(data_lemmatized))
     # Create Dictionary
-    id2word = corpora.Dictionary(data_lemmatized)
+    # id2word = corpora.Dictionary(data_lemmatized)
+    id2word = corpora.Dictionary(tri_g)
     # print('id2word',id2word)
     # Create Corpus
     texts = data_lemmatized
+    print('lemms',texts)
 
     # Term Document Frequency
-    corpus = [id2word.doc2bow(text) for text in texts]
+    # corpus = [id2word.doc2bow(text) for text in texts]
+    corpus = [id2word.doc2bow(text) for text in tri_g]
     # print('corpus',corpus)
     # View
     print('corpus is created')#(word,frequency of occuring)
@@ -109,7 +122,13 @@ def run_lda_model(posts,number_of_topics):#this will extract paragraph and heade
     print("mallet",mallet_list)
     return words_list
 
+df = pd.read_csv("../Data/ANXIETY_all_posts.csv", encoding='utf8')
+# print(df['post'][0])
+anxiety_post_set = []
+for each_p in df['post']:
+    anxiety_post_set.append(each_p)
 
+run_lda_model(anxiety_post_set,10)
 #To run this scrpit individually use following line and run the script
 # topics = run_lda_model(path to the json object,number_of_topics)
 # print(topics)
